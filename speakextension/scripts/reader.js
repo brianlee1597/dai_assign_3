@@ -1,39 +1,43 @@
 jQuery(function () { 
-    let prev, curr;
+    let helperOn = false;
 
-    $(document).on('mousemove', function (e) {
-        curr = e.target;
-    })
-
-    $("*:not(body)").on("keydown", function (e) {
-        e.preventDefault();
-
-        if (e.key !== ' ') {
-            $(curr).removeClass("highlight");
-            (prev == curr) && speechSynthesis.cancel();
-            return;
-        }
-    
-        if (prev) {
-            $(prev).removeClass("highlight");
+    // to turn on / off audio and highlight 
+    $(document).on("keydown", function (event) {
+        event.preventDefault();
+        helperOn = event.key === ' '; // true if space, false if anything else.
+        
+        if (!helperOn) {
+            $("*:not(body)").removeClass("highlight");
             speechSynthesis.cancel();
         }
+    })
 
+    $("*:not(body)").on("mouseenter", function (event) {
+        if (!helperOn) return;
+
+        event.stopPropagation();
+        $(this).addClass("highlight");
+        
         let text;
 
-        if ($(curr).is('img')) {
-            const alttext = $(curr).attr("alt");
-            const srcofimg = $(curr).attr("src");
+        if ($(this).is('img')) {
+            const alttext = $(this).attr("alt");
+            const srcofimg = $(this).attr("src");
 
-            text = $(curr).attr('alt') ? alttext : srcofimg;
+            text = $(this).attr('alt') ? alttext : srcofimg;
         } else {
-            text = $(curr).text();
+            text = $(this).text();
         }
-
-        $(curr).addClass("highlight");
+        
         const speech = new SpeechSynthesisUtterance(text);
-        speechSynthesis.speak(speech); 
+        speechSynthesis.speak(speech);
+    })
 
-        prev = curr;
+    $("*:not(body)").on("mouseleave", function (event) {
+        if (!helperOn) return;
+        
+        event.stopPropagation();
+        $(this).removeClass("highlight");
+        speechSynthesis.cancel();
     })
 })
