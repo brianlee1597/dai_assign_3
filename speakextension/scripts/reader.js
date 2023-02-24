@@ -36,7 +36,6 @@ jQuery(function () {
     $("*:not(body)").on("mouseleave", function (event) {
         if (!helperOn) return;
         
-        event.stopPropagation();
         $(this).removeClass("highlight");
         speechSynthesis.cancel();
     })
